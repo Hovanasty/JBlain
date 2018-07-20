@@ -1,0 +1,35 @@
+{
+  "devDependencies": {
+    "@symfony/webpack-encore": "^0.19.0",
+    "node-sass": "^4.9.2",
+    "sass-loader": "^7.0.3"
+  },
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "dev-server": "encore dev-server",
+    "dev": "encore dev",
+    "watch": "encore dev --watch",
+    "build": "encore production"
+  },
+  "dependencies": {
+    "jquery": "^3.3.1",
+    "webpack-notifier": "^1.6.0"
+  },
+  "name": "jblain",
+  "description": "",
+  "version": "1.0.0",
+  "main": "webpack.config.js",
+  "directories": {
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hovanasty/JBlain.git"
+  },
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/Hovanasty/JBlain/issues"
+  },
+  "homepage": "https://github.com/Hovanasty/JBlain#readme"
+}
