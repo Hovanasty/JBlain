@@ -8,7 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 class FrontController extends Controller
 {
     /**
-     * @Route("/front", name="front")
+     * @Route("/", name="homepage")
      */
     public function index()
     {
@@ -16,4 +16,5 @@ class FrontController extends Controller
             'controller_name' => 'FrontController',
         ]);
     }
+
 }
