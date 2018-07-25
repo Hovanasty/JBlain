@@ -16,6 +16,7 @@ Encore
 
     .addEntry('app', './assets/js/app.js')
     .addEntry('style', './assets/scss/main.scss')
+    .addEntry('favicon', './assets/pictures/favicon.png')
 
     .cleanupOutputBeforeBuild()
     .enableBuildNotifications()
