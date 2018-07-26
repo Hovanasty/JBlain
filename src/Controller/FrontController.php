@@ -66,14 +66,14 @@ class FrontController extends Controller
 
                 $to = $userPasswordLost->getEmail();
                 $mailer->sendForgotPasswordMail($url, $userPasswordLost, $to);
-                /*
+
                 $this->addFlash('success', 'Consultez votre boite mail. Un message vous a été envoyé avec un lien pour réinitialiser votre mot de passe  ');
             } else {
 
-                $this->addFlash('danger', 'Nous n\'avons pas trouvé d\'utilisateur avec cet email, merci de rééssayer');
-                */
+                $this->addFlash('error', 'Nous n\'avons pas trouvé d\'utilisateur avec cet email, merci de rééssayer');
 
-                return $this->redirectToRoute('homepage');
+
+                return $this->redirectToRoute('forgotpassword');
             }
         }
         return $this->render('user/forgot_password.html.twig', array(
@@ -110,12 +110,12 @@ class FrontController extends Controller
 
                 $entityManager->flush();
 
-                //$this->addFlash('success', 'Votre mot de passe a été mis à jour');
+                $this->addFlash('success', 'Votre mot de passe a été mis à jour');
 
                 return $this->redirectToRoute('homepage');
 
             } else {
-                //$this->addFlash('danger', 'la réinitialisation de votre mot de passe a échoué, veuillez renouveler votre demande');
+                $this->addFlash('error', 'la réinitialisation de votre mot de passe a échoué, veuillez renouveler votre demande');
 
                 return $this->redirectToRoute('forgotpassword');
             }
