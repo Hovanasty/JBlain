@@ -2,8 +2,17 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
+use App\Form\ForgotPasswordType;
+use App\Form\ResetPasswordType;
+use App\Services\Mail\Mailer;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class FrontController extends Controller
 {
@@ -26,5 +35,96 @@ class FrontController extends Controller
         return new Response('<html><body>Admin page!</body></html>');
     }
 
+
+    /**
+     * @Route("/forgot_password", name="forgotpassword")
+     */
+    public function forgotPassword(Request $request, Mailer $mailer)
+    {
+
+        $form = $this->createForm(ForgotPasswordType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $data = $form->getData();
+            $email = $data['email'];
+
+            $userPasswordLost = $this->getDoctrine()
+                ->getRepository(User:: class)
+                ->findOneBy([
+                    'email' => $email
+                ]);
+
+            if ($userPasswordLost) {
+                $token = uniqid();
+                $userPasswordLost->setToken($token);
+                $em = $this->getDoctrine()->getManager();
+                $em->flush();
+                $url = $this->generateUrl('resetPassword', array('token' => $token), UrlGeneratorInterface::ABSOLUTE_URL);
+                // UrlGeneratorInterface::ABSOLUTE_URL
+
+                $to = $userPasswordLost->getEmail();
+                $mailer->sendForgotPasswordMail($url, $userPasswordLost, $to);
+                /*
+                $this->addFlash('success', 'Consultez votre boite mail. Un message vous a été envoyé avec un lien pour réinitialiser votre mot de passe  ');
+            } else {
+
+                $this->addFlash('danger', 'Nous n\'avons pas trouvé d\'utilisateur avec cet email, merci de rééssayer');
+                */
+
+                return $this->redirectToRoute('homepage');
+            }
+        }
+        return $this->render('user/forgot_password.html.twig', array(
+            'form'=>$form->createView()
+        ));
+    }
+
+    /**
+     * @Route("/resetpassword/{token}", name="resetPassword")
+     * @Method({"GET", "POST"})
+     *
+     */
+    public function resetPassword ($token, Request $request, UserPasswordEncoderInterface $encoder)
+    {
+
+
+        $form = $this->createForm(ResetPasswordType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            $newPassword = $data['newPassword'];
+            $user = $this->getDoctrine()->getRepository(User:: class)->findOneBy(['token' => $token]);
+
+            if ($user) {
+
+                $entityManager = $this->getDoctrine()->getManager();
+
+                $passwordEncoded = $encoder->encodePassword($user, $newPassword);
+                $user->setPassword($passwordEncoded);
+
+                $user->setToken(null);
+
+
+                $entityManager->flush();
+
+                //$this->addFlash('success', 'Votre mot de passe a été mis à jour');
+
+                return $this->redirectToRoute('homepage');
+
+            } else {
+                //$this->addFlash('danger', 'la réinitialisation de votre mot de passe a échoué, veuillez renouveler votre demande');
+
+                return $this->redirectToRoute('forgotpassword');
+            }
+        }
+        return $this->render('user/reset_password.html.twig', array(
+            'form'=>$form->createView()
+
+        ));
+
+    }
 
 }

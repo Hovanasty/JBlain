@@ -18,32 +18,37 @@ class SecurityController extends AbstractController
      */
     public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder)
     {
-        $user = new User();
-        $form = $this->createForm(UserType::class, $user);
+        if ($this->getUser()){
+            return $this->redirectToRoute('logout');
+        }else{
+            $user = new User();
+            $form = $this->createForm(UserType::class, $user);
 
-        $form->handleRequest($request);
+            $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
 
-            $password = $passwordEncoder->encodePassword($user, $user->getPlainPassword());
-            $user->setPassword($password);
+                $password = $passwordEncoder->encodePassword($user, $user->getPlainPassword());
+                $user->setPassword($password);
 
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($user);
-            $entityManager->flush();
+                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager->persist($user);
+                $entityManager->flush();
 
 
-            $token = new UsernamePasswordToken($user, null, 'main', $user->getRoles());
-            $this->container->get('security.token_storage')->setToken($token);
-            $this->container->get('session')->set('_security_main', serialize($token));
+                $token = new UsernamePasswordToken($user, null, 'main', $user->getRoles());
+                $this->container->get('security.token_storage')->setToken($token);
+                $this->container->get('session')->set('_security_main', serialize($token));
 
-            return $this->redirectToRoute('homepage');
+                return $this->redirectToRoute('homepage');
+            }
+
+            return $this->render(
+                'security/register.html.twig',
+                array('form' => $form->createView())
+            );
         }
 
-        return $this->render(
-            'security/register.html.twig',
-            array('form' => $form->createView())
-        );
     }
 
     /**

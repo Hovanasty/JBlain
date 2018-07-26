@@ -55,6 +55,13 @@ class User implements UserInterface
      */
     private $password;
 
+    /**
+     *
+     *
+     * @ORM\Column(name="token", nullable=true, unique=true)
+     */
+    private $token;
+
 
     // other properties and methods
 
@@ -138,5 +145,21 @@ class User implements UserInterface
             // see section on salt below
             // $this->salt
             ) = unserialize($serialized, array('allowed_classes' => false));
+    }
+
+    /**
+     * @return string
+     */
+    public function getToken(): string
+    {
+        return $this->token;
+    }
+
+    /**
+     * @param string $token
+     */
+    public function setToken($token)
+    {
+        $this->token = $token;
     }
 }
