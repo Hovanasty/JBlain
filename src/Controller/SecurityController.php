@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Form\UserType;
 use App\Entity\User;
 use App\Services\Mail\Mailer;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -32,20 +31,28 @@ class SecurityController extends AbstractController
             if ($form->isSubmitted() && $form->isValid()) {
 
                 $password = $passwordEncoder->encodePassword($user, $user->getPlainPassword());
-                $activationTokenAccount = uniqid();
-                $urlActivationAccount = $this->generateUrl('activation_account', array('activationTokenAccount' => $activationTokenAccount), UrlGeneratorInterface::ABSOLUTE_URL);
+                $accountTokenActivation = uniqid();
+                $urlAccountActivation = $this->generateUrl(
+                    'account_activation',
+                    array('accountTokenActivation' => $accountTokenActivation),
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                );
+
                 $user->setPassword($password);
-                $user->setAccountActivationToken($activationTokenAccount);
+                $user->setAccountActivationToken($accountTokenActivation);
 
                 $entityManager = $this->getDoctrine()->getManager();
                 $entityManager->persist($user);
                 $entityManager->flush();
 
-                $mailer->sendActivationAcountMail($urlActivationAccount,$user,$user->getEmail());
+                $mailer->sendActivationAcountMail($urlAccountActivation,$user,$user->getEmail());
 
                 $token = new UsernamePasswordToken($user, null, 'main', $user->getRoles());
                 $this->container->get('security.token_storage')->setToken($token);
                 $this->container->get('session')->set('_security_main', serialize($token));
+
+                $this->addFlash('success', 'Compte créé');
+                $this->addFlash('info', 'Un mail d\'activation vous a été envoyé');
 
                 return $this->redirectToRoute('homepage');
             }
@@ -79,22 +86,30 @@ class SecurityController extends AbstractController
     }
 
     /**
-     * @Route("/activation_account/{token}" name="activation_account")
-     *
+     * @Route("/account_activation/{accountTokenActivation}", name="account_activation")
      */
-    public function ActivationAccount(Request $request, $token)
+    public function ActivationAccount(Request $request, $accountTokenActivation)
     {
-        /*
-        dump($token);
-        $userSession = $this->getDoctrine()-> getRepository('App:User')->findOneBy(['accountActivationToken' => $token]);
-        dump($userSession);die;
+        $user = $this->getDoctrine()-> getRepository('App:User')->findOneBy(['accountActivationToken' => $accountTokenActivation]);
 
-        $userPasswordLost = $this->getDoctrine()->getRepository(User:: class)->findOneBy(['email' => $email]);
+        if (is_object($user)){
 
-        $token = new UsernamePasswordToken($user, null, 'main', $user->getRoles());
-        $this->container->get('security.token_storage')->setToken($token);
-        $this->container->get('session')->set('_security_main', serialize($token));
-        */
+            $user->setAccountActivationToken(Null);
+
+            $em = $this->getDoctrine()->getManager();
+            $em->flush();
+
+            $token = new UsernamePasswordToken($user, null, 'main', $user->getRoles());
+            $this->container->get('security.token_storage')->setToken($token);
+            $this->container->get('session')->set('_security_main', serialize($token));
+
+            $this->addFlash('success', 'Compte activé !');
+
+        }else{
+
+            $this->addFlash('error', 'Aucun compte à activer');
+        }
+
+        return $this->render('front/index.html.twig');
     }
-
 }

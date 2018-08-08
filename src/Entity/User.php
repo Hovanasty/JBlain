@@ -8,7 +8,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="UserRepository")
  * @UniqueEntity(fields="email", message="Email already taken")
  * @UniqueEntity(fields="username", message="Username already taken")
  */
@@ -67,8 +67,19 @@ class User implements UserInterface
      */
     private $accountActivationToken;
 
+    /**
+     * @var \DateTime
+     * @ORM\Column(name="created_at", type="datetime")
+     */
+    private $createdAt;
+
 
     // other properties and methods
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime();
+    }
 
     public function getEmail()
     {
@@ -178,5 +189,10 @@ class User implements UserInterface
         $this->accountActivationToken = $accountActivationToken;
 
         return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
     }
 }
