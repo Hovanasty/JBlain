@@ -22,8 +22,8 @@ class Mailer
         $mail = new \Swift_Message();
 
         $mail
-            ->setFrom('maxime.pinto.dev@gmail.com')
-            ->setTo('maxime.pinto@outlook.fr')
+            ->setFrom($this->adminEmail)
+            ->setTo($to)
             ->setSubject($subject)
             ->setBody($body)
             ->setContentType('text/html');
@@ -42,6 +42,16 @@ class Mailer
         $this->sendMail($subject, $body, $to);
     }
 
+    public function sendActivationAcountMail($url, $user, $to)
+    {
+        $subject = 'Activation de compte';
+
+        $body = $this->environment->render('mail/activationAcountMail.html.twig',array(
+            'user' => $user,
+            'url' => $url,
+        ));
+        $this->sendMail($subject, $body, $to);
+    }
 
     /*
     protected $mailer;

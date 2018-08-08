@@ -62,6 +62,11 @@ class User implements UserInterface
      */
     private $token;
 
+    /**
+     * @ORM\Column(type="string", length=64, nullable=true)
+     */
+    private $accountActivationToken;
+
 
     // other properties and methods
 
@@ -161,5 +166,17 @@ class User implements UserInterface
     public function setToken($token)
     {
         $this->token = $token;
+    }
+
+    public function getAccountActivationToken(): ?string
+    {
+        return $this->accountActivationToken;
+    }
+
+    public function setAccountActivationToken(?string $accountActivationToken): self
+    {
+        $this->accountActivationToken = $accountActivationToken;
+
+        return $this;
     }
 }
