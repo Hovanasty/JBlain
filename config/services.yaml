@@ -34,3 +34,4 @@ services:
     App\Services\Mail\Mailer:
         arguments:
             $adminEmail: '%admin_email%'
+            
