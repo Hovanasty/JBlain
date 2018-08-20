@@ -2,34 +2,28 @@
 
 namespace App\Controller;
 
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use App\Entity\User;
 use App\Form\RemoveUserType;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
-
-class TestController extends Controller
+class UserController extends Controller
 {
     /**
-     * @Route("/test", name="test")
+     * @Route("/profil", name="profil")
      */
     public function index()
     {
-        $var1 = $_SERVER;
-        $var2 = $_ENV;
-        $var3 = $GLOBALS;
-        return $this->render('test/index.html.twig', [
-            'controller_name' => 'TestController',
-            'server' => $var1,
-            'env' => $var2,
-            'session' => $var3
+        return $this->render('user/profil.html.twig', [
+            'controller_name' => 'UserController',
         ]);
     }
 
+
     /**
-     * @Route("/testDelete", name="test_delete")
+     * @Route("/delete_user", name="deleteUser")
      */
     public function test(Request $request, UserPasswordEncoderInterface $passwordEncoder)
     {
@@ -47,6 +41,9 @@ class TestController extends Controller
                 $entityManager->remove($user);
                 $entityManager->flush();
 
+
+
+                // vide la session afin de ne pas la recharger avec un profil supprimé
                 $token = null;
                 $this->container->get('security.token_storage')->setToken($token);
 
@@ -59,8 +56,7 @@ class TestController extends Controller
         }
 
 
-        return $this->render('test/deleteTest.html.twig', array('form'=>$form->createView()));
+        return $this->render('user/deleteUser', array('form'=>$form->createView()));
 
     }
-
 }
