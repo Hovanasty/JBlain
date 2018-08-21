@@ -9,17 +9,17 @@ use Doctrine\ORM\EntityRepository;
  */
 class UserRepository extends EntityRepository
 {
-    public function deletedUser()
+    public function deletedInactiveAccount()
     {
         $queryBuilder = $this->createQueryBuilder('u')
-            ->delete('AppBundle:User', 'u')
-            ->andWhere("u.isDeleted IS NOT NULL")
+            ->delete('App:User', 'u')
+            ->andWhere("u.accountActivationToken IS NOT NULL")
 
             //date de supp doit être plus récente que le paramètre 1
-            ->andwhere("u.isDeleted < ?1")
+            ->andwhere("u.createdAt < ?1")
 
-            //on set le paramètre avec la date du jour - 31 jours
-            ->setParameter(1, date_modify(new \DateTime("now"), '-31 day'));
+            //on set le paramètre avec lisDeleteda date du jour - 5 jours
+            ->setParameter(1, date_modify(new \DateTime("now"), '-5 day'));
 
         $query = $queryBuilder->getQuery();
         $result = $query->getResult();
