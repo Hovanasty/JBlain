@@ -20,12 +20,13 @@ security:
                 check_path: login
                 provider: our_db_provider
             logout:
+                invalidate_session: false
                 path:   /logout
                 target: /
             remember_me:
                 secret:   '%kernel.secret%'
                 lifetime: 604800 # 1 week in seconds
-                path:
+                path: /
 
     access_control:
         - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
