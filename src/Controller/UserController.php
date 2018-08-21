@@ -25,7 +25,7 @@ class UserController extends Controller
     /**
      * @Route("/delete_user", name="deleteUser")
      */
-    public function test(Request $request, UserPasswordEncoderInterface $passwordEncoder)
+    public function deleteUser(Request $request, UserPasswordEncoderInterface $passwordEncoder)
     {
         $user = $this->getUser();
 
@@ -58,5 +58,14 @@ class UserController extends Controller
 
         return $this->render('user/deleteUser', array('form'=>$form->createView()));
 
+    }
+
+    /**
+     * @Route("/send_another_activation_email", name="sendAnotherActivationEmail")
+     */
+    public function sendAnotherActivationEmail()
+    {
+        $user = $this->getUser();
+        dump($user);die;
     }
 }
