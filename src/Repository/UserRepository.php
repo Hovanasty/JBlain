@@ -11,6 +11,7 @@ class UserRepository extends EntityRepository
 {
     public function deletedInactiveAccount()
     {
+        //Query utilisée dans la commande DeleteUser
         $queryBuilder = $this->createQueryBuilder('u')
             ->delete('App:User', 'u')
             ->andWhere("u.accountActivationToken IS NOT NULL")

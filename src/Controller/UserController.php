@@ -25,7 +25,7 @@ class UserController extends Controller
     /**
      * @Route("/delete_user", name="deleteUser")
      */
-    public function test(Request $request, UserPasswordEncoderInterface $passwordEncoder)
+    public function deleteUser(Request $request, UserPasswordEncoderInterface $passwordEncoder)
     {
         $user = $this->getUser();
 

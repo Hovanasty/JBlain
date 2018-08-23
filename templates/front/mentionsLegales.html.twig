@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mentions légales{% endblock %}
+
+{% block body %}
+    <section class="container">
+        <div class="row">
+            <div class="col-12">
+                <a href="{{ path('sendEmailAccountActivation') }}">Renvoyer un email d'activation de compte</a>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block javascripts %}
+    <script src="{{ asset('build/app.js') }}"></script>
+{% endblock %}

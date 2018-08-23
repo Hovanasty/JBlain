@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\ForgotPasswordType;
 use App\Form\ResetPasswordType;
+use App\Form\VerifyUserType;
 use App\Services\Mail\Mailer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class FrontController extends Controller
@@ -124,7 +126,71 @@ class FrontController extends Controller
             'form'=>$form->createView()
 
         ));
+    }
 
+    /**
+     * @Route("mentions_legales", name="mentionsLegales")
+     *
+     */
+    public function legalsMentionShow()
+    {
+        return $this->render('front/mentionsLegales.html.twig');
+    }
+
+    /**
+     * @Route("send_email_account_activation", name="sendEmailAccountActivation")
+     *
+     */
+    public function sendEmailAccountActivation(Request $request, UserPasswordEncoderInterface $passwordEncoder, Mailer $mailer)
+    {
+        $form = $this->createForm(VerifyUserType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $data = $form->getData();
+            $email = $data['email'];
+            $repository = $this->getDoctrine()->getRepository(User::class);
+            $user = $repository->findOneBy(['email'=> $email]);
+            $verifyUser = $passwordEncoder->isPasswordValid($user,$data['plainPassword']);
+            $token = $user->getAccountActivationToken();
+
+
+            if (($verifyUser == true) && $token) {
+
+                // on flush le token d'activation de compte
+                $accountTokenActivation = uniqid();
+                $urlAccountActivation = $this->generateUrl(
+                    'account_activation',
+                    array('accountTokenActivation' => $accountTokenActivation),
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                );
+
+                $user->setAccountActivationToken($accountTokenActivation);
+
+                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager->persist($user);
+                $entityManager->flush();
+
+                // on prévient via un mail l'utilisateur qu'il doit activer son compte
+                $mailer->sendActivationAcountMail($urlAccountActivation, $user, $user->getEmail());
+
+                $this->addFlash('info', 'Un mail d\'activation vous a été envoyé');
+
+                return $this->redirectToRoute('homepage');
+
+            } elseif (($verifyUser == false) || $token){
+                $this->addFlash('error', 'mot de passe ou email incorrect');
+
+            } elseif (($verifyUser == true) && !$token){
+                $this->addFlash('error', 'compte déjà activé');
+
+            }
+        }
+
+        return $this->render('front/VerifyUserTypeSendActivationAcount.html.twig', array(
+            'form'=>$form->createView())
+        );
     }
 
 }

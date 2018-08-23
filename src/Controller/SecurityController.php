@@ -49,10 +49,12 @@ class SecurityController extends AbstractController
                 // on prévient via un mail l'utilisateur qu'il doit activer son compte
                 $mailer->sendActivationAcountMail($urlAccountActivation,$user,$user->getEmail());
 
+                /* Plus d'actualité
                 // on met en session l'utilisateur pour qu'il soit connecté automatiquement après l'inscription
                 $token = new UsernamePasswordToken($user, null, 'main', $user->getRoles());
                 $this->container->get('security.token_storage')->setToken($token);
                 $this->container->get('session')->set('_security_main', serialize($token));
+                 */
 
                 $this->addFlash('success', 'Compte créé');
                 $this->addFlash('info', 'Un mail d\'activation vous a été envoyé');
