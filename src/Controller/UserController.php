@@ -59,13 +59,4 @@ class UserController extends Controller
         return $this->render('user/deleteUser', array('form'=>$form->createView()));
 
     }
-
-    /**
-     * @Route("/send_another_activation_email", name="sendAnotherActivationEmail")
-     */
-    public function sendAnotherActivationEmail()
-    {
-        $user = $this->getUser();
-        dump($user);die;
-    }
 }
