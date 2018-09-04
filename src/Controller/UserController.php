@@ -59,4 +59,5 @@ class UserController extends Controller
         return $this->render('user/deleteUser', array('form'=>$form->createView()));
 
     }
+
 }

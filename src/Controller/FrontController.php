@@ -29,14 +29,6 @@ class FrontController extends Controller
     }
 
 
-    /**
-     * @Route("/admin")
-     */
-    public function admin()
-    {
-        return $this->render('front/admin.html.twig');
-    }
-
 
     /**
      * @Route("/forgot_password", name="forgotpassword")
